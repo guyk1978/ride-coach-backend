@@ -28,9 +28,10 @@ router.post('/', async (req, res) => {
 
     res.json({ message: 'Plan saved successfully' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Database error' });
-  }
+  console.error('Database error details:', error);
+  res.status(500).json({ error: error.message });
+}
+
 });
 
 // GET to retrieve plan by email
