@@ -1,13 +1,18 @@
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2');
 
-const pool = mysql.createPool({
-  host: 'localhost',                  // או הכתובת שקיבלת מ־Hostinger
-  user: 'u220582403',                 // שם המשתמש למסד
-  password: '|t4SR36T5UL',       // הסיסמה שלך למסד
-  database: 'u220582403_ebikeroutes_db',  // שם מסד הנתונים
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+const connection = mysql.createConnection({
+  host: 'srv535.hstgr.io',      // או 185.28.21.52 – אפשר לבחור אחד מהם
+  user: 'u220582403',           // שם המשתמש שלך
+  password: '|t4SR36T5UL',      // הסיסמה שלך
+  database: 'u220582403_ebikeroutes_db'  // שם מסד הנתונים שלך
 });
 
-module.exports = pool;
+connection.connect(err => {
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+    return;
+  }
+  console.log('Connected to MySQL database');
+});
+
+module.exports = connection;
