@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const coachRoutes = require('./coach');
-
+const coachRoutes = require('./coach');  // הנתיב נכון לפי מיקום הקובץ
 
 const app = express();
 

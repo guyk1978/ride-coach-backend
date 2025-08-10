@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('./db');  // כאן אנחנו מייבאים את ה-pool
+const pool = require('./db');
 
 router.post('/', async (req, res) => {
   const { email, goals, weeklyHours, difficulty } = req.body;
@@ -33,6 +33,22 @@ router.post('/', async (req, res) => {
   }
 });
 
-// וגם GET כפי שהיה
+// GET to retrieve plan by email
+router.get('/:email', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM user_plans WHERE email = ?', [req.params.email]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Plan not found' });
+    }
+
+    const plan = rows[0];
+    plan.goals = plan.goals.split(',');
+
+    res.json(plan);
+  } catch (error) {
+    res.status(500).json({ error: 'Database error' });
+  }
+});
 
 module.exports = router;
