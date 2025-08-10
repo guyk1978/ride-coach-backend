@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const coachRoutes = require('./routes/coach');
+const coachRoutes = require('./coach');
 
 const app = express();
 
