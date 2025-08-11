@@ -1,7 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('./db');
+const pool = require('./db'); // MySQL connection pool
 
+// GET all plans
+router.get('/', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM user_plans ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// POST create or update plan
 router.post('/', async (req, res) => {
   const { email, goals, weeklyHours, difficulty } = req.body;
 
@@ -10,7 +22,7 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const goalsStr = goals.join(',');
+    const goalsStr = Array.isArray(goals) ? goals.join(',') : goals;
 
     const [rows] = await pool.query('SELECT * FROM user_plans WHERE email = ?', [email]);
 
@@ -28,26 +40,24 @@ router.post('/', async (req, res) => {
 
     res.json({ message: 'Plan saved successfully' });
   } catch (error) {
-  console.error('Database error details:', error);
-  res.status(500).json({ error: error.message });
-}
-
+    console.error(error);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
 
-// GET to retrieve plan by email
-router.get('/:email', async (req, res) => {
+// DELETE a plan by email
+router.delete('/:email', async (req, res) => {
+  const { email } = req.params;
+  
   try {
-    const [rows] = await pool.query('SELECT * FROM user_plans WHERE email = ?', [req.params.email]);
-
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Plan not found' });
+    const [result] = await pool.query('DELETE FROM user_plans WHERE email = ?', [email]);
+    if (result.affectedRows > 0) {
+      res.json({ message: `Plan for ${email} deleted successfully` });
+    } else {
+      res.status(404).json({ error: 'Plan not found' });
     }
-
-    const plan = rows[0];
-    plan.goals = plan.goals.split(',');
-
-    res.json(plan);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Database error' });
   }
 });
